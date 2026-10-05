@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<style>
+@page { size: A4; margin: 2.2cm; @bottom-center { content: {{ footer_css }}; white-space: pre; font: 8px/1.4 Arial, sans-serif; color: #5A6B7F; } }
+body { font: 15px/1.7 Georgia, serif; color: #1A2332; }
+h1, h2 { color: #1E3A5F; }
+.audit { page-break-before: always; font-family: Arial, sans-serif; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>{{ contract.title }}</h1>
+{% for block in blocks %}{% if block.tag == "h2" %}<h2>{{ block.text }}</h2>{% else %}<p>{{ block.text }}</p>{% endif %}
+{% endfor %}
+<section class="audit">
+<h2>Trilha de auditoria</h2>
+<p>SHA-256: {{ contract.hash_sha256|default:"Documento ainda não finalizado" }}</p>
+<ul>
+{% for event in events %}<li>{{ event.get_type_display }} — {{ event.party.name }} — {{ event.timestamp|date:"d/m/Y H:i" }} — {{ event.ip|default:"IP não informado" }}</li>
+{% endfor %}</ul>
+</section>
+</body>
+</html>

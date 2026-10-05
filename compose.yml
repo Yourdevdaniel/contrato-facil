@@ -1,0 +1,83 @@
+# Local development stack. Every value below has a dev-only default;
+# override any of them in a .env file next to this one (see .env.example).
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-contratofacil}
+      POSTGRES_USER: ${POSTGRES_USER:-contratofacil}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-contratofacil}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-contratofacil}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      DEBUG: ${DEBUG:-1}
+      SECRET_KEY: ${SECRET_KEY:-dev-insecure-change-me-local-only-32-bytes}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-contratofacil}:${POSTGRES_PASSWORD:-contratofacil}@db:5432/${POSTGRES_DB:-contratofacil}
+      REDIS_URL: redis://redis:6379/0
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      EMAIL_BACKEND: ${EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}
+      PIX_WEBHOOK_SECRET: ${PIX_WEBHOOK_SECRET:-local-pix-secret}
+      CELERY_TASK_ALWAYS_EAGER: "0"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    volumes:
+      - media_data:/app/media
+
+  worker:
+    build: ./backend
+    command: celery -A config worker -l info
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-dev-insecure-change-me-local-only-32-bytes}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-contratofacil}:${POSTGRES_PASSWORD:-contratofacil}@db:5432/${POSTGRES_DB:-contratofacil}
+      REDIS_URL: redis://redis:6379/0
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      EMAIL_BACKEND: ${EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}
+      CELERY_TASK_ALWAYS_EAGER: "0"
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  beat:
+    build: ./backend
+    command: celery -A config beat -l info
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-dev-insecure-change-me-local-only-32-bytes}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-contratofacil}:${POSTGRES_PASSWORD:-contratofacil}@db:5432/${POSTGRES_DB:-contratofacil}
+      REDIS_URL: redis://redis:6379/0
+      CELERY_TASK_ALWAYS_EAGER: "0"
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  media_data:
