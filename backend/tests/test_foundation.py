@@ -1,6 +1,7 @@
 import pytest
 from django.urls import reverse
 from rest_framework.test import APIClient
+from tests._credentials import TEST_PASSWORD
 
 
 @pytest.mark.django_db
@@ -15,7 +16,7 @@ def test_healthcheck_and_authentication_flow():
         {
             "name": "Ana Souza",
             "email": "ana@example.com",
-            "password": "senha-segura-123",
+            "password": TEST_PASSWORD,
             "cpf_cnpj": "12345678901",
             "phone": "11999999999",
         },
@@ -27,7 +28,7 @@ def test_healthcheck_and_authentication_flow():
 
     login = client.post(
         "/api/auth/login/",
-        {"email": "ana@example.com", "password": "senha-segura-123"},
+        {"email": "ana@example.com", "password": TEST_PASSWORD},
         format="json",
     )
     assert login.status_code == 200

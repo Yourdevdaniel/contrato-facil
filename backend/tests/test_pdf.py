@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 from contracts.models import Contract, ContractTemplate, Party, SignatureEvent
 from contracts.pdf import PDF_FOOTER, basic_pdf, contract_pdf_html, safe_url_fetcher
+from tests._credentials import TEST_PASSWORD
 
 PAYLOAD = '<img src="http://evil.test/x">'
 
@@ -16,7 +17,7 @@ def test_fallback_pdf_prints_legal_footer():
 
 @pytest.mark.django_db
 def test_pdf_html_escapes_user_values():
-    user = User.objects.create_user(username="owner@example.com", password="safe-password")
+    user = User.objects.create_user(username="owner@example.com", password=TEST_PASSWORD)
     template = ContractTemplate.objects.create(name="Modelo", slug="modelo", category="Teste", description="Teste")
     contract = Contract.objects.create(
         user=user, template=template, title=PAYLOAD, responses={},

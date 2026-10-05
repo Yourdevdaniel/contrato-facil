@@ -1,13 +1,14 @@
 import pytest
 from django.core.management import call_command
 from rest_framework.test import APIClient
+from tests._credentials import TEST_PASSWORD
 
 
 def authenticated_client():
     client = APIClient()
     response = client.post(
         "/api/auth/register/",
-        {"name": "Ana", "email": "ana@example.com", "password": "senha-segura-123"},
+        {"name": "Ana", "email": "ana@example.com", "password": TEST_PASSWORD},
         format="json",
     )
     client.credentials(HTTP_AUTHORIZATION=f"Bearer {response.json()['access']}")

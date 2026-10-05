@@ -4,6 +4,7 @@ from django.core.management import call_command
 from django.utils import timezone
 from rest_framework.test import APIClient
 from contracts.models import Party
+from tests._credentials import TEST_PASSWORD
 
 
 def create_contract(client):
@@ -25,7 +26,7 @@ def test_two_party_signature_audit_pdf_and_pix_webhook():
     client = APIClient()
     auth = client.post(
         "/api/auth/register/",
-        {"name": "Ana", "email": "ana@example.com", "password": "senha-segura-123"},
+        {"name": "Ana", "email": "ana@example.com", "password": TEST_PASSWORD},
         format="json",
     ).json()
     client.credentials(HTTP_AUTHORIZATION=f"Bearer {auth['access']}")

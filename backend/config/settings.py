@@ -68,7 +68,7 @@ SIMPLE_JWT = {"AUTH_HEADER_TYPES": ("Bearer",)}
 EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "ContratoFácil <contratos@example.com>")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
-PIX_WEBHOOK_SECRET = os.getenv("PIX_WEBHOOK_SECRET", "local-pix-secret")
+PIX_WEBHOOK_SECRET = os.getenv("PIX_WEBHOOK_SECRET", "dev-only-placeholder")
 CELERY_BROKER_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 CELERY_TASK_ALWAYS_EAGER = os.getenv("CELERY_TASK_ALWAYS_EAGER", "1") == "1"
 CELERY_BEAT_SCHEDULE = {

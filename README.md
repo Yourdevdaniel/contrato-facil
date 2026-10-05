@@ -62,7 +62,7 @@ Signing page for the second party, after the 6-digit code check, with typed and 
 ### With Docker
 
 ```bash
-cp .env.example .env    # optional, every value has a local default
+cp .env.example .env    # then set POSTGRES_PASSWORD and PIX_WEBHOOK_SECRET
 docker compose up --build
 ```
 
